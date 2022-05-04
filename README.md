@@ -48,7 +48,7 @@ This script is for demo purposes only. It deploys a bare minimum, single-node K3
 
 # Uninstall Methods
 
-1. From within the `stackrox-demo-server` directory, run `/usr/local/bin/k3s-uninstall.sh && rm -rf central-bundle/ sensor-k3s/` (removes K3s, Rancher, Longhorn and StackRox)
+1. From within the `stackrox-demo-server` directory, run `/usr/local/bin/k3s-uninstall.sh && rm -rf central-bundle/ sensor-k3s/ && rm server-details.txt` (removes K3s, Rancher, Longhorn and StackRox)
 
 ## Special Thanks
 

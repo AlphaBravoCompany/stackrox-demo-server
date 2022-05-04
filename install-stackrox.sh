@@ -97,7 +97,7 @@ echo "Deploying Stackrox Sensor..."
 kubectl apply -R -f sensor-k3s/ > /dev/null 2>&1
 
 ## Wait for Stackrox Sensor and Admission Controller
-echo "Waiting for Stackrox Central and Scanner to come online..."
+echo "Waiting for Stackrox Sensor to come online..."
 until [ $(kubectl -n stackrox rollout status deploy/sensor|grep successfully | wc -l) = 1 ]; do echo -n "." ; sleep 2; done > /dev/null 2>&1
 until [ $(kubectl -n stackrox rollout status deploy/admission-control|grep successfully | wc -l) = 1 ]; do echo -n "." ; sleep 2; done > /dev/null 2>&1
 
@@ -151,10 +151,10 @@ export RANCHERPW=$(kubectl get secret --namespace cattle-system bootstrap-secret
 touch ./server-details.txt
 echo -----------------------------------------------
 echo -e ${G}Install is complete. Please use the below information to access your environment.${E} | tee ./server-details.txt
-echo -e ${G}Please update your DNS or Hosts file to point https://$1 to the IP of this server $NODE_IP.${E} | tee ./server-details.txt
-echo -e ${G}StackRox UI:${E} $STACKROXUI | tee ./server-details.txt
-echo -e ${G}StackRox Login${E}: admin/$password | tee ./server-details.txt
-echo -e ${G}Rancher UI:${E} https://$1 | tee ./server-details.txt
-echo -e ${G}Rancher Password:${E} $RANCHERPW | tee ./server-details.txt
+echo -e ${G}Please update your DNS or Hosts file to point https://$1 to the IP of this server $NODE_IP.${E} | tee -a ./server-details.txt
+echo -e ${G}StackRox UI:${E} $STACKROXUI | tee -a ./server-details.txt
+echo -e ${G}StackRox Login${E}: admin/$password | tee -a ./server-details.txt
+echo -e ${G}Rancher UI:${E} https://$1 | tee -a ./server-details.txt
+echo -e ${G}Rancher Password:${E} $RANCHERPW | tee -a ./server-details.txt
 echo Details above are saved to the file at ./server-details.txt
 echo -----------------------------------------------
