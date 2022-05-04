@@ -46,16 +46,22 @@ This script is for demo purposes only. It deploys a bare minimum, single-node K3
 5. Install will take approximately 10 minutes and will output links and login information for Rancher and your StackRox installation.
 6. Details for accessing StackRox and Rancher will be printed to the screen once the script completes and saved to `server-details.txt`
 
+# Updating the StackRox OSS Version
+
+- Visit the `https://quay.io/organization/stackrox-io/` registry page and find the image tag you want to use. Choosing main and viewing the tags will likely be sufficient as it seems all images have the same tagging applied.
+- Edit the `install-stackrox.sh` file and update the `rox_version` variable to use the new image tag.
+- Uninstall using the below method and rerun the `install-stackrox.sh` script as before.
+
 # Uninstall Methods
 
 1. From within the `stackrox-demo-server` directory, run `/usr/local/bin/k3s-uninstall.sh && rm -rf central-bundle/ sensor-k3s/ && rm server-details.txt` (removes K3s, Rancher, Longhorn and StackRox)
 
 ## Special Thanks
 
-Thanks to Andy Clemenko for his expertise and repos for making this possible.
+Thanks to Andy Clemenko for his expertise and repos for providing the foundation for this script.
 
-StackRox OSS Script: https://github.com/clemenko/sr_tools/blob/main/StackRox_oss.sh
-Andy's Github: https://github.com/clemenko/sr_tools
+- StackRox OSS Script: https://github.com/clemenko/sr_tools/blob/main/StackRox_oss.sh
+- Andy's Github: https://github.com/clemenko/sr_tools
 
 ## About Alphabravo
 
