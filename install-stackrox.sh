@@ -34,7 +34,7 @@ echo "Installing Prereqs..."
 sudo apt-get update > /dev/null 2>&1
 sudo apt-get install -y \
 apt-transport-https ca-certificates curl gnupg lsb-release \
-software-properties-common haveged bash-completion  > /dev/null 2>&1
+software-properties-common haveged bash-completion jq > /dev/null 2>&1
 
 ## Install Helm
 echo "Installing Helm..."
@@ -56,7 +56,7 @@ until [ $(kubectl get nodes|grep Ready | wc -l) = 1 ]; do echo -n "." ; sleep 2;
 echo "Deploying Longhorn on K3s..."
 helm repo add longhorn https://charts.longhorn.io > /dev/null 2>&1
 helm repo update > /dev/null 2>&1
-helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace > /dev/null 2>&1
+helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --set csi.attacherReplicaCount=1 --set csi.provisionerReplicaCount=1 --set csi.resizerReplicaCount=1 --set csi.snapshotterReplicaCount=1 > /dev/null 2>&1
 
 # Install Roxctl
 echo "Installing Roxctl..."
@@ -70,6 +70,13 @@ mv roxctl /usr/local/bin/ > /dev/null 2>&1
 # Here we are using a PVC from Longhorn and exposing with NodePort. You can apply an ingress to the central pod later.
 echo "Generating Stackrox Central and Scanner configs..."
 roxctl central generate k8s pvc --storage-class longhorn --size 10 --enable-telemetry=false --lb-type np --password $password  --main-image quay.io/stackrox-io/main:$rox_version --scanner-db-image quay.io/stackrox-io/scanner-db:$rox_version --scanner-image quay.io/stackrox-io/scanner:$rox_version > /dev/null 2>&1
+
+# Update Scanner replicas to only have 1 instead of 3
+sleep 10
+sed -i '0,/replicas: 3/{s/replicas: 3/replicas: 1/}' central-bundle/scanner/02-scanner-06-deployment.yaml > /dev/null 2>&1
+sed -i '0,/cpu: 1000m/{s/cpu: 1000m/cpu: 500m/}' central-bundle/scanner/02-scanner-06-deployment.yaml > /dev/null 2>&1
+sed -i '0,/minReplicas: 2/{s/minReplicas: 2/minReplicas: 1/}' central-bundle/scanner/02-scanner-08-hpa.yaml > /dev/null 2>&1
+sleep 10
 
 # Create namespace and install central and scanner
 echo "Deploying Stackrox Central and Scanner..."
@@ -91,6 +98,11 @@ rox_port=$(kubectl -n stackrox get svc central-loadbalancer |grep Node|awk '{pri
 # create a sensor "cluster" using the ports and the admin password.
 echo "Generating Stackrox Sensor configs..."
 roxctl sensor generate k8s -e $server:$rox_port --name k3s --central central.stackrox:443 --insecure-skip-tls-verify --collection-method ebpf --admission-controller-listen-on-updates --admission-controller-listen-on-creates -p $password --main-image-repository quay.io/stackrox-io/main:$rox_version --collector-image-repository quay.io/stackrox-io/collector > /dev/null 2>&1
+
+# Update Sensor Admission Controller replicas to only have 1 instead of 3
+sleep 10
+sed -i '0,/replicas: 3/{s/replicas: 3/replicas: 1/}' sensor-k3s/admission-controller.yaml > /dev/null 2>&1
+sleep 10
 
 # deploy the sensor/collectors
 echo "Deploying Stackrox Sensor..."
