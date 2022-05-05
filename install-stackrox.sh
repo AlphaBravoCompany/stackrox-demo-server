@@ -60,7 +60,7 @@ helm install longhorn longhorn/longhorn --namespace longhorn-system --create-nam
 
 # Install Roxctl
 echo "Installing Roxctl..."
-wget https://mirror.openshift.com/pub/rhacs/assets/3.69.1/bin/Linux/roxctl > /dev/null 2>&1
+wget https://mirror.openshift.com/pub/rhacs/assets/latest/bin/Linux/roxctl > /dev/null 2>&1
 chmod 0755 roxctl > /dev/null 2>&1
 chmod +x roxctl > /dev/null 2>&1
 mv roxctl /usr/local/bin/ > /dev/null 2>&1
@@ -149,7 +149,7 @@ helm repo add rancher-stable https://releases.rancher.com/server-charts/stable >
 kubectl create namespace cattle-system > /dev/null 2>&1
 helm install rancher rancher-stable/rancher \
   --namespace cattle-system \
-  --set hostname=$1 > /dev/null 2>&1
+  --set hostname=$1 --set bootstrapPassword=bootStrapAllTheThings --set replicas=1 > /dev/null 2>&1
 
 ## Wait for Rancher
 echo "Waiting for Rancher UI to come online...."
